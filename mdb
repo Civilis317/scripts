@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [ "$1" = "start" ];
+then
+  MONGO=/Users/civilis/Infra/java/db/mongodb/bin/mongod
+  CONFIG=/Users/civilis/Infra/java/db/mongodb/mongod.conf
+  AUTH="--auth"
+  MSG="starting mongodb server..."
+
+  if [ "$2" = "noauth" ];
+  then
+    AUTH="--noauth"
+    MSG="starting mongodb server without authentication..."
+  fi
+
+  echo -n "$MSG"
+  "$MONGO" "$AUTH" --config "$CONFIG" &
+  echo " Success!"
+
+elif [ "$1" = "stop" ];
+then
+  
+  # NB: 
+  # You cannot have spaces around your '=' sign in variable assignment.
+  # eg: pid = `ps -ef | grep mongod | grep -v grep | awk '{print $2}'`
+  # will result in pid: command not found
+  # https://stackoverflow.com/questions/2268104/command-not-found-error-in-bash-variable-assignment
+
+  PID=`ps -ef | grep mongod | grep -v mdb | grep -v grep | grep -v nano | awk '{print $2}'`
+  
+  if [ -n "$PID" ];
+  then
+    echo -n "Stopping process id: " "$PID""..."
+    kill "$PID"
+    echo " Done!"
+  
+  else
+    echo "Process id for mongod not found, is it running?"
+  fi
+
+fi
