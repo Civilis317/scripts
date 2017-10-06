@@ -1,0 +1,24 @@
+ sudo svnadmin create /var/lib/svn/myrepo
+
+ 
+sudo su
+sudo apt-get update
+sudo apt-get install apache2
+sudo apt-get install subversion libapache2-mod-svn libapache2-svn libsvn-dev
+sudo a2enmod dav
+sudo a2enmod dav_svn
+sudo service apache2 restart
+nano /etc/apache2/mods-enabled/dav_svn.conf
+sudo cp /etc/apache2/mods-enabled/dav_svn.conf /etc/apache2/mods-enabled/dav_svn.conf.example
+sudo nano /etc/apache2/mods-enabled/dav_svn.conf
+sudo mkdir -p /var/lib/svn/
+sudo svnadmin create /var/lib/svn/myrepo
+sudo chown -R www-data:www-data /var/lib/svn
+sudo chmod -R 775 /var/lib/svn
+sudo htpasswd -cm /etc/apache2/dav_svn.passwd admin
+nano  /etc/apache2/dav_svn.passwd
+sudo htpasswd -m /etc/apache2/dav_svn.passwd developer
+sudo htpasswd -m /etc/apache2/dav_svn.passwd jenkins
+sudo service apache2 restart
+sudo nano /etc/apache2/mods-enabled/dav_svn.conf
+sudo service apache2 restart

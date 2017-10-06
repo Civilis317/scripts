@@ -1,0 +1,84 @@
+#!/bin/sh
+
+# POST-COMMIT HOOK
+
+# fail on error
+set -e
+
+# bypass any proxy's
+export http_proxy=''
+export https_proxy=''
+
+# init variables
+JENKINS_URL=https://jenkins-jenkins.hg.vialis.local
+JENKINS_USER=lie-admin
+JENKINS_USER_TOKEN=ffe243d31f93564e75bbf5c53cef7713
+JENKINS_JOB=''
+JOB_TOKEN=''
+
+# known projects
+NPR_GATEWAY="service-providers/trunk/services/npr-gateway"
+PARKING_DATA_DISTRIBUTOR="service-providers/trunk/services/parking-data-distributor"
+# etc, etc
+
+# commands
+CURL=/usr/bin/curl
+SVNLOOK=/usr/bin/svnlook
+
+# function that returns the committed project in $1, using $REPOS as $2
+parse_project() {
+  PROJECT=''
+  DIRS=`$SVNLOOK dirs-changed $2`
+
+  # get first line of dirs-changed
+  for DIR in $DIRS:
+  do
+    PROJECT=$DIR
+        # split on "/" and get first part of array
+    #for PATH in $(echo $DIR | tr "/" "\n")
+    #do
+    #      PROJECT=$PATH
+    #      break
+    #done
+    break
+  done
+  eval "$1=$PROJECT"
+}
+
+# inspect commit to get committed project
+REPOS="$1"
+REV="$2"
+TXN_NAME="$3"
+
+PROJECT=''
+parse_project PROJECT $REPOS
+
+# output project in case of error
+>&2 echo repos: "$REPOS"
+>&2 echo rev  : "$REV"
+>&2 echo txn  : "$TXN_NAME"
+>&2 echo project: $PROJECT
+
+# evaluate projects
+if [[ "${PROJECT}" == *$NPR_GATEWAY* ]];
+then
+  # job specific variables
+  JENKINS_JOB=npr-gateway-pipeline
+  JOB_TOKEN=298fc678-03c8-4731-bece-76e1ba34010e
+
+elif [[ "${PROJECT}" == *$PARKING_DATA_DISTRIBUTOR* ]];
+then
+  # job specific variables
+  JENKINS_JOB=parking-data-distributor-pipeline
+  JOB_TOKEN=219651f9-ccd6-48a9-a241-8172ad748021
+
+else
+# a commit to a not web-hooked project
+exit 0
+fi
+
+# perform call
+$CURL --insecure --user $JENKINS_USER:$JENKINS_USER_TOKEN $JENKINS_URL/job/$JENKINS_JOB/build?token=$JOB_TOKEN
+
+exit 0
+
