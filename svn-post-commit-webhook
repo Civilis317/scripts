@@ -10,15 +10,15 @@ export http_proxy=''
 export https_proxy=''
 
 # init variables
-JENKINS_URL=https://jenkins-jenkins.hg.vialis.local
-JENKINS_USER=lie-admin
-JENKINS_USER_TOKEN=ffe243d31f93564e75bbf5c53cef7713
+JENKINS_URL=https://some-jenkins-url
+JENKINS_USER=jenkins
+JENKINS_USER_TOKEN=ffaae24ggf93564e75bbf5c53cef7713
 JENKINS_JOB=''
 JOB_TOKEN=''
 
 # known projects
-NPR_GATEWAY="service-providers/trunk/services/npr-gateway"
-PARKING_DATA_DISTRIBUTOR="service-providers/trunk/services/parking-data-distributor"
+PROJECT_X="<trunk>/<folder>/<projectx>"
+PROJECT_Y="<project>/<folder>/<another folder>/<projecty>"
 # etc, etc
 
 # commands
@@ -60,17 +60,17 @@ parse_project PROJECT $REPOS
 >&2 echo project: $PROJECT
 
 # evaluate projects
-if [[ "${PROJECT}" == *$NPR_GATEWAY* ]];
+if [[ "${PROJECT}" == *$PROJECT_X* ]];
 then
   # job specific variables
-  JENKINS_JOB=npr-gateway-pipeline
-  JOB_TOKEN=298fc678-03c8-4731-bece-76e1ba34010e
+  JENKINS_JOB=<jenkins-job-for-project-x>
+  JOB_TOKEN=298fc678-03c8-4731-aace-76e1ii34010e
 
-elif [[ "${PROJECT}" == *$PARKING_DATA_DISTRIBUTOR* ]];
+elif [[ "${PROJECT}" == *$PROJECT_Y* ]];
 then
   # job specific variables
-  JENKINS_JOB=parking-data-distributor-pipeline
-  JOB_TOKEN=219651f9-ccd6-48a9-a241-8172ad748021
+  JENKINS_JOB=<jenkins-job-for-project-y>
+  JOB_TOKEN=21qq51f9-ccd6-48a9-a241-8172tt748021
 
 else
 # a commit to a not web-hooked project
